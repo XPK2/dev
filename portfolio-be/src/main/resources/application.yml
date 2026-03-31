@@ -26,6 +26,7 @@ spring:
     locations: classpath:db/migration
     outOfOrder: true
     cleanDisabled: true
+    validateOnMigrate: false
 
 server:
   port: 8080
@@ -39,3 +40,13 @@ jwt:
 logging:
   level:
     org.springframework: INFO
+
+# Actuator local
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always

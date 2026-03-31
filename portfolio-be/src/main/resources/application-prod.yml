@@ -1,0 +1,72 @@
+# application-prod.yml — Production config cho Render.com + Neon Tech
+# Tất cả secrets đều đọc từ Environment Variables trên Render dashboard
+
+spring:
+  application:
+    name: couple-backend
+
+  datasource:
+    # Neon Tech cung cấp DATABASE_URL dạng:
+    # postgresql://user:pass@ep-xxx.us-east-2.aws.neon.tech/neondb?sslmode=require
+    url: ${DATABASE_URL}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 3          # Neon free tier giới hạn connections
+      minimum-idle: 1
+      connection-timeout: 20000
+      idle-timeout: 300000
+      max-lifetime: 1200000
+      connection-test-query: SELECT 1
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        jdbc:
+          batch_size: 20
+        order_inserts: true
+        order_updates: true
+    open-in-view: false
+
+  flyway:
+    enabled: true
+    baselineOnMigrate: true
+    locations: classpath:db/migration
+    outOfOrder: true
+    cleanDisabled: true
+    validateOnMigrate: false
+
+server:
+  port: ${PORT:8080}   # Render tự inject PORT
+  servlet:
+    context-path: /
+  # Tắt compression nếu Render dùng proxy (đã handle ở edge)
+  compression:
+    enabled: false
+
+jwt:
+  secret: ${JWT_SECRET}       # Set trên Render Environment Variables
+  expiration: 86400000
+
+# Actuator — chỉ expose health endpoint ra public
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: never
+  server:
+    port: ${PORT:8080}
+
+logging:
+  level:
+    root: WARN
+    com.couple.backend: INFO
+  pattern:
+    console: "%d{HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"

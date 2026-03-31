@@ -26,10 +26,38 @@
 body {
   font-family: 'Outfit', sans-serif;
   color: var(--text-dark);
-  background: linear-gradient(135deg, var(--bg-gradient-1) 0%, var(--bg-gradient-2) 100%);
+  background-color: #ffccd5;
   min-height: 100vh;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
+  position: relative;
+}
+
+/* Ảnh nền blur toàn app */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-image: var(--bg-image, none);
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  filter: blur(4px) brightness(0.92);
+  transform: scale(1.04); /* tránh viền trắng do blur */
+}
+
+/* Overlay hồng mờ phủ lên ảnh */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 240, 243, 0.55) 0%,
+    rgba(255, 204, 213, 0.55) 100%
+  );
 }
 
 h1,
@@ -679,4 +707,15 @@ h6 {
   .digit-container {
     gap: 8px;
   }
+}
+
+/* ─── Spin Wheel ─────────────────────────────────────────────────────────── */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
 }

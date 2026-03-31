@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Send, Smile } from 'lucide-react';
 import { Client } from '@stomp/stompjs';
-import SockJS from 'sockjs-client';
 import { chatApi } from '../services/api';
+import { USERS } from '../constants/users';
+import { initNotifications, showMessageNotification } from '../services/notifications';
 
 const EMOJIS = ['❤️', '😍', '🥰', '😘', '💕', '😊', '😂', '🥺', '😭', '✨', '💖', '🌹', '🐱', '🐶', '🎉'];
 
@@ -17,7 +18,10 @@ const Chat = () => {
 
   const myUserId = parseInt(localStorage.getItem('userId')) || 1;
   const otherUserId = myUserId === 1 ? 2 : 1;
-  const partnerName = myUserId === 1 ? 'Hà' : 'Huy';
+  const partner = USERS[otherUserId];
+
+  // Xin quyền push notification khi mở Chat lần đầu
+  useEffect(() => { initNotifications(); }, []);
 
   // Load lịch sử tin nhắn
   const loadMessages = useCallback(async () => {
@@ -41,7 +45,7 @@ const Chat = () => {
 
     const token = localStorage.getItem('token');
     const client = new Client({
-      webSocketFactory: () => new SockJS('http://localhost:8080/ws'),
+      brokerURL: import.meta.env.VITE_WS_URL || `ws://localhost:8080/ws/websocket`,
       connectHeaders: { Authorization: `Bearer ${token}` },
       reconnectDelay: 5000,
       onConnect: () => {
@@ -52,6 +56,10 @@ const Chat = () => {
             // Tránh duplicate (optimistic update)
             if (prev.some(m => m.id === msg.id)) {
               return prev.map(m => m.id === msg.id ? msg : m);
+            }
+            // Nếu tin nhắn từ partner → hiện push notification
+            if (msg.senderId !== myUserId) {
+              showMessageNotification(partner.name, msg.content, partner.avatar);
             }
             return [...prev, msg];
           });
@@ -124,12 +132,12 @@ const Chat = () => {
     <div className="fade-in chat-container glass-panel" style={{ padding: 0, overflow: 'hidden' }}>
       <div className="chat-header">
         <img
-          src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=100&q=80"
-          alt="Partner"
+          src={partner.avatar}
+          alt={partner.name}
           className="avatar"
         />
         <div>
-          <h3 style={{ margin: 0, fontSize: '1.2rem', fontFamily: 'Outfit, sans-serif' }}>{partnerName}</h3>
+          <h3 style={{ margin: 0, fontSize: '1.2rem', fontFamily: 'Outfit, sans-serif' }}>{partner.name}</h3>
           <span style={{ fontSize: '0.8rem', color: connected ? 'var(--primary)' : 'var(--text-light)', display: 'flex', alignItems: 'center', gap: '4px' }}>
             <span style={{ width: '8px', height: '8px', background: connected ? 'var(--primary)' : '#aaa', borderRadius: '50%', display: 'inline-block' }}></span>
             {connected ? 'Online' : 'Connecting...'}

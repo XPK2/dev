@@ -1,4 +1,4 @@
-const BASE_URL = 'http://localhost:8080/api/v1';
+const BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:8080/api/v1');
 
 // Get Headers with Auth Token
 const getHeaders = (isAuth = false) => {
@@ -105,5 +105,13 @@ export const eventsApi = {
   getUpcoming: async () => apiClient.get('/events/upcoming', true),
   create: async (data) => apiClient.post('/events', data, true),
   delete: async (id) => apiClient.delete(`/events/${id}`, true),
+};
+
+// Spin Wheel APIs
+export const spinApi = {
+  getAll: async () => apiClient.get('/spin', true),
+  getByCategory: async (category) => apiClient.get(`/spin/${category}`, true),
+  create: async (data) => apiClient.post('/spin', data, true),
+  delete: async (id) => apiClient.delete(`/spin/${id}`, true),
 };
 

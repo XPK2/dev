@@ -128,6 +128,12 @@
             <artifactId>spring-boot-starter-websocket</artifactId>
         </dependency>
 
+        <!-- Actuator (health check endpoints) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+
         <!-- Development Tools -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

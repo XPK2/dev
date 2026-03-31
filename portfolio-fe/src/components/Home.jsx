@@ -1,7 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { format, differenceInDays } from 'date-fns';
-import { Heart, Calendar as CalendarIcon, Gift, Plus, Trash2 } from 'lucide-react';
+import { Heart, Calendar as CalendarIcon, Plus, Trash2 } from 'lucide-react';
 import { anniversaryApi, eventsApi } from '../services/api';
+import { USERS } from '../constants/users';
+
+const myUserId = parseInt(localStorage.getItem('userId')) || 1;
+const partnerId = myUserId === 1 ? 2 : 1;
+const ME = USERS[myUserId];
+const PARTNER = USERS[partnerId];
 
 const Home = () => {
   const [days, setDays] = useState(0);
@@ -87,15 +93,15 @@ const Home = () => {
         <div className="counter-content">
           <div className="avatar-row">
             <img
-              src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&q=80"
-              alt="You"
+              src={ME.avatar}
+              alt={ME.name}
               className="avatar animate-float"
               style={{ animationDelay: '0s' }}
             />
             <Heart size={36} className="heart-icon animate-pulse-heart" />
             <img
-              src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=200&q=80"
-              alt="Partner"
+              src={PARTNER.avatar}
+              alt={PARTNER.name}
               className="avatar animate-float"
               style={{ animationDelay: '1s' }}
             />
