@@ -1,17 +1,21 @@
-# application-prod.yml — Production config cho Render.com + Neon Tech
-# Tất cả secrets đều đọc từ Environment Variables trên Render dashboard
+# application-prod.yml — Production config for Render.com + Neon Tech
+# All secrets are read from Environment Variables set on Render dashboard
 
 spring:
   application:
     name: couple-backend
 
   datasource:
-    # Neon Tech cung cấp DATABASE_URL dạng:
-    # postgresql://user:pass@ep-xxx.us-east-2.aws.neon.tech/neondb?sslmode=require
-    url: ${DATABASE_URL}
+    # Neon Tech provides DATABASE_URL as:
+    #   postgresql://user:pass@ep-xxx.us-east-2.aws.neon.tech/neondb?sslmode=require
+    # Spring requires the jdbc: prefix — set JDBC_DATABASE_URL on Render instead:
+    #   jdbc:postgresql://user:pass@ep-xxx.../neondb?sslmode=require
+    # OR set DATABASE_URL and use the jdbc-url workaround below.
+    # RECOMMENDED: on Render dashboard set env var name = JDBC_DATABASE_URL
+    url: ${JDBC_DATABASE_URL:${DATABASE_URL}}
     driver-class-name: org.postgresql.Driver
     hikari:
-      maximum-pool-size: 3          # Neon free tier giới hạn connections
+      maximum-pool-size: 3          # Neon free tier connection limit
       minimum-idle: 1
       connection-timeout: 20000
       idle-timeout: 300000
@@ -34,24 +38,30 @@ spring:
   flyway:
     enabled: true
     baselineOnMigrate: true
+    baseline-version: 0
     locations: classpath:db/migration
-    outOfOrder: true
+    outOfOrder: false
     cleanDisabled: true
     validateOnMigrate: false
 
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
 server:
-  port: ${PORT:8080}   # Render tự inject PORT
+  port: ${PORT:10000}
   servlet:
     context-path: /
-  # Tắt compression nếu Render dùng proxy (đã handle ở edge)
+  tomcat:
+    max-http-form-post-size: 10485760
   compression:
     enabled: false
 
 jwt:
-  secret: ${JWT_SECRET}       # Set trên Render Environment Variables
+  secret: ${JWT_SECRET}
   expiration: 86400000
 
-# Actuator — chỉ expose health endpoint ra public
 management:
   endpoints:
     web:
@@ -61,8 +71,6 @@ management:
   endpoint:
     health:
       show-details: never
-  server:
-    port: ${PORT:8080}
 
 logging:
   level:
