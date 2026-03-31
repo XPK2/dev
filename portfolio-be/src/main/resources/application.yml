@@ -1,11 +1,13 @@
 spring:
   application:
     name: couple-backend
+
   datasource:
     url: jdbc:postgresql://localhost:5432/postgres
     username: postgres
     password: 123456
     driver-class-name: org.postgresql.Driver
+
   jpa:
     hibernate:
       ddl-auto: validate
@@ -20,6 +22,7 @@ spring:
         order_inserts: true
         order_updates: true
     open-in-view: false
+
   flyway:
     enabled: true
     baselineOnMigrate: true
@@ -28,20 +31,27 @@ spring:
     cleanDisabled: true
     validateOnMigrate: false
 
+  # Tăng giới hạn request size cho upload ảnh base64
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
 server:
   port: 8080
   servlet:
     context-path: /
+  tomcat:
+    max-http-form-post-size: 10485760
 
 jwt:
   secret: my-super-secret-key-that-is-at-least-32-characters-long-for-jwt-signing
-  expiration: 86400000  # 24 hours in milliseconds
+  expiration: 86400000
 
 logging:
   level:
     org.springframework: INFO
 
-# Actuator local
 management:
   endpoints:
     web:

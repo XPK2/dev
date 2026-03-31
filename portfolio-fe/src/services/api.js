@@ -115,3 +115,11 @@ export const spinApi = {
   delete: async (id) => apiClient.delete(`/spin/${id}`, true),
 };
 
+// Photo Gallery APIs
+export const photoApi = {
+  list: async () => apiClient.get('/photos', true),
+  getOne: async (id) => apiClient.get(`/photos/${id}`, true),
+  upload: async (data) => apiClient.post('/photos', data, true),
+  delete: async (id) => apiClient.delete(`/photos/${id}`, true),
+};
+

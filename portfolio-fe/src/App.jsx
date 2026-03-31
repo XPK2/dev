@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
-import { Heart, MessageCircle, ListTodo, ClipboardList, LogOut, Dices } from 'lucide-react';
+import { Heart, MessageCircle, ListTodo, ClipboardList, LogOut, Dices, Image } from 'lucide-react';
 import bgImage from './assets/bg.jpg';
 import Landing from './components/Landing';
 import Home from './components/Home';
@@ -8,6 +8,7 @@ import Chat from './components/Chat';
 import BucketList from './components/BucketList';
 import FamilyRules from './components/FamilyRules';
 import SpinWheel from './components/SpinWheel';
+import Gallery from './components/Gallery';
 import Login from './components/Login';
 import { USERS } from './constants/users';
 
@@ -49,6 +50,8 @@ const MainApp = () => {
         return <FamilyRules />;
       case 'spin':
         return <SpinWheel />;
+      case 'gallery':
+        return <Gallery userId={myUserId} />;
       default:
         return <Home />;
     }
@@ -108,6 +111,14 @@ const MainApp = () => {
         >
           <Dices className="nav-icon" size={18} />
           <span>Spin</span>
+        </button>
+
+        <button
+          className={`nav-item ${activeTab === 'gallery' ? 'active' : ''}`}
+          onClick={() => setActiveTab('gallery')}
+        >
+          <Image className="nav-icon" size={18} />
+          <span>Album</span>
         </button>
 
         <button className="nav-item" onClick={handleLogout}>
