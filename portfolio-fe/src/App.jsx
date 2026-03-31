@@ -12,7 +12,7 @@ import Gallery from './components/Gallery';
 import Login from './components/Login';
 import { USERS } from './constants/users';
 
-// Inject background qua CSS variable để ::before pseudo có thể blur
+// Inject background via CSS variable so ::before pseudo-element can apply blur
 document.documentElement.style.setProperty('--bg-image', `url(${bgImage})`);
 
 // Protected Route Component
@@ -61,7 +61,7 @@ const MainApp = () => {
     <div className="app-container">
       <nav className="top-nav" style={{ overflowX: 'auto', scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch', justifyContent: 'flex-start' }}>
 
-        {/* Avatar người dùng hiện tại */}
+        {/* Current user avatar */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '0 12px', minWidth: 'fit-content' }}>
           <img
             src={me?.avatar}

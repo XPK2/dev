@@ -13,7 +13,7 @@ public class PhotoService {
 
     private final PhotoRepository repo;
 
-    // ── Tối đa 5MB per ảnh (base64 ~= 4/3 * raw, 5MB raw ≈ 6.7MB base64) ──
+    // Max ~5 MB per photo (base64 ≈ 4/3 × raw; 5 MB raw ≈ 6.7 MB base64)
     private static final int MAX_BASE64_LEN = 7_000_000;
 
     public List<PhotoSummary> listAll() {
@@ -26,7 +26,7 @@ public class PhotoService {
                 p.getFileSize(),
                 p.getTakenDate(),
                 p.getCreatedAt().toString(),
-                null   // thumbPrefix — không dùng, FE load full qua /photos/{id}
+                null   // thumbPrefix — FE fetches full image via /photos/{id}
             ))
             .toList();
     }
@@ -45,7 +45,7 @@ public class PhotoService {
             throw new IllegalArgumentException("Image too large (max 5MB)");
         }
 
-        // Trích mime type từ data URI: "data:image/jpeg;base64,..."
+        // Extract mime type from data URI: "data:image/jpeg;base64,..."
         String mimeType = "image/jpeg";
         if (data.startsWith("data:")) {
             int semicolon = data.indexOf(';');
@@ -71,7 +71,7 @@ public class PhotoService {
     public void delete(Long id, Long userId) {
         Photo photo = repo.findById(id)
             .orElseThrow(() -> new RuntimeException("Photo not found"));
-        // Cả 2 người đều có thể xóa
+        // Both users can delete any photo
         repo.delete(photo);
     }
 }

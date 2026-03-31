@@ -16,19 +16,19 @@ public class PhotoController {
 
     private final PhotoService service;
 
-    /** Danh sách ảnh (metadata only, không có data base64) */
+    /** List photos — metadata only, no base64 data */
     @GetMapping
     public ApiResponse<List<PhotoSummary>> list() {
         return ApiResponse.success("Photos retrieved", service.listAll());
     }
 
-    /** Lấy 1 ảnh đầy đủ (kèm data base64) */
+    /** Get single photo with full base64 data */
     @GetMapping("/{id}")
     public ApiResponse<Photo> getOne(@PathVariable Long id) {
         return ApiResponse.success("Photo retrieved", service.getById(id));
     }
 
-    /** Upload ảnh mới */
+    /** Upload a new photo */
     @PostMapping
     public ApiResponse<Photo> upload(
             @RequestBody Map<String, Object> body,
@@ -36,7 +36,7 @@ public class PhotoController {
         CustomUserDetails user = (CustomUserDetails) authentication.getPrincipal();
         try {
             Photo saved = service.upload(body, user.getUserId());
-            // Trả về metadata (không trả lại data base64 cho đỡ nặng response)
+            // Return metadata only — strip heavy base64 from response
             saved.setData("[uploaded]");
             return ApiResponse.success("Photo uploaded", saved);
         } catch (IllegalArgumentException e) {
@@ -44,7 +44,7 @@ public class PhotoController {
         }
     }
 
-    /** Xóa ảnh */
+    /** Delete a photo */
     @DeleteMapping("/{id}")
     public ApiResponse<Void> delete(
             @PathVariable Long id,

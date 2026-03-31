@@ -9,8 +9,7 @@ import java.util.List;
 @Repository
 public interface PhotoRepository extends JpaRepository<Photo, Long> {
 
-    // Lấy tất cả ảnh, sort theo taken_date DESC, createdAt DESC
-    // Chỉ lấy metadata (không lấy data) cho list view — dùng projection
+    // Fetch all photos sorted by taken_date DESC then created_at DESC
     List<Photo> findAllByOrderByTakenDateDescCreatedAtDesc();
 
     @Query("SELECT p FROM Photo p ORDER BY p.takenDate DESC, p.createdAt DESC")

@@ -2,14 +2,14 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Plus, Trash2, RotateCcw, ChefHat, Coffee, Loader2, CalendarCheck } from 'lucide-react';
 import { spinApi, eventsApi } from '../services/api';
 
-// ─── Màu sắc cho từng ô trên vòng quay ───────────────────────────────────────
+// ─── Segment colours ─────────────────────────────────────────────────────────
 const SEGMENT_COLORS = [
   '#ff4d6d', '#ff758f', '#ff85a1', '#c9184a',
   '#ff6b9d', '#ff4081', '#f50057', '#ff80ab',
   '#e91e63', '#ad1457', '#880e4f', '#fc4e7b',
 ];
 
-// ─── Vẽ vòng quay lên canvas (không vẽ mũi tên — dùng HTML div) ─────────────
+// ─── Draw wheel onto canvas (arrow rendered as HTML div) ─────────────────────
 const drawWheel = (canvas, places, rotation) => {
   if (!canvas || places.length === 0) return;
   const ctx = canvas.getContext('2d');
@@ -22,7 +22,7 @@ const drawWheel = (canvas, places, rotation) => {
 
   ctx.clearRect(0, 0, W, H);
 
-  // Clip vòng tròn để wheel gọn
+  // Clip to circle so segments stay inside the boundary
   ctx.save();
   ctx.beginPath();
   ctx.arc(cx, cy, R, 0, 2 * Math.PI);
@@ -32,7 +32,7 @@ const drawWheel = (canvas, places, rotation) => {
     const startAngle = rotation + i * arc;
     const endAngle = startAngle + arc;
 
-    // Vẽ ô
+    // Draw segment
     ctx.beginPath();
     ctx.moveTo(cx, cy);
     ctx.arc(cx, cy, R, startAngle, endAngle);
@@ -61,14 +61,14 @@ const drawWheel = (canvas, places, rotation) => {
 
   ctx.restore(); // end clip
 
-  // Viền ngoài vòng tròn
+  // Outer ring
   ctx.beginPath();
   ctx.arc(cx, cy, R, 0, 2 * Math.PI);
   ctx.strokeStyle = 'rgba(255,255,255,0.8)';
   ctx.lineWidth = 3;
   ctx.stroke();
 
-  // Tâm hình tròn
+  // Centre circle
   ctx.beginPath();
   ctx.arc(cx, cy, 20, 0, 2 * Math.PI);
   ctx.fillStyle = '#fff';
@@ -77,7 +77,7 @@ const drawWheel = (canvas, places, rotation) => {
   ctx.lineWidth = 3;
   ctx.stroke();
 
-  // Tim ở giữa
+  // Heart icon
   ctx.font = '14px serif';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
@@ -98,10 +98,10 @@ const SpinWheel = () => {
   const [addedToCalendar, setAddedToCalendar] = useState(false);
 
   const canvasRef = useRef(null);
-  const rotationRef = useRef(0);         // góc hiện tại (radian)
+  const rotationRef  = useRef(0);        // current angle (radians)
   const animFrameRef = useRef(null);
 
-  // ── Load dữ liệu ──────────────────────────────────────────────────────────
+  // ── Load data ─────────────────────────────────────────────────────────────
   const loadPlaces = useCallback(async () => {
     setLoading(true);
     try {
@@ -120,7 +120,7 @@ const SpinWheel = () => {
 
   useEffect(() => { loadPlaces(); }, [loadPlaces]);
 
-  // Khi đổi tab thì reset kết quả
+  // Reset result on tab change
   useEffect(() => {
     setPlaces(allPlaces[tab] || []);
     setResult(null);
@@ -128,7 +128,7 @@ const SpinWheel = () => {
     rotationRef.current = 0;
   }, [tab, allPlaces]);
 
-  // ── Vẽ lại canvas khi places thay đổi ────────────────────────────────────
+  // ── Redraw canvas when places change ─────────────────────────────────────
   useEffect(() => {
     drawWheel(canvasRef.current, places, rotationRef.current);
   }, [places]);
@@ -144,12 +144,12 @@ const SpinWheel = () => {
     const totalSegments = places.length;
     const arc = (2 * Math.PI) / totalSegments;
 
-    // Quay tối thiểu 5 vòng + lệch ngẫu nhiên
+    // Minimum 5 full rotations + random offset
     const extraSpins = 5 + Math.random() * 5;
     const extraAngle = Math.random() * 2 * Math.PI;
     const totalAngle = extraSpins * 2 * Math.PI + extraAngle;
 
-    const duration = 4000 + Math.random() * 1500; // 4–5.5 giây
+    const duration = 4000 + Math.random() * 1500; // 4–5.5 s
     const startTime = performance.now();
     const startRotation = rotationRef.current;
 
@@ -166,9 +166,8 @@ const SpinWheel = () => {
       if (progress < 1) {
         animFrameRef.current = requestAnimationFrame(animate);
       } else {
-        // Tính ô kết quả: mũi tên ở góc 0 (bên phải), normalise góc về [0, 2π)
+        // Arrow points at angle 0 (right side) — normalise to [0, 2π)
         const normalized = ((currentAngle % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
-        // Mũi tên trỏ vào góc 0 → ô nào đang ở đó?
         const angleAtArrow = (2 * Math.PI - normalized) % (2 * Math.PI);
         const winIndex = Math.floor(angleAtArrow / arc) % totalSegments;
         setResult(places[winIndex]);
@@ -179,10 +178,10 @@ const SpinWheel = () => {
     animFrameRef.current = requestAnimationFrame(animate);
   };
 
-  // Cleanup animation khi unmount
+  // Cleanup on unmount
   useEffect(() => () => { if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current); }, []);
 
-  // ── Thêm quán ─────────────────────────────────────────────────────────────
+  // ── Add place ─────────────────────────────────────────────────────────────
   const handleAdd = async (e) => {
     e.preventDefault();
     if (!newPlace.name.trim()) return;
@@ -204,7 +203,7 @@ const SpinWheel = () => {
     }
   };
 
-  // ── Xóa quán ──────────────────────────────────────────────────────────────
+  // ── Remove place ──────────────────────────────────────────────────────────
   const handleDelete = async (id) => {
     setAllPlaces(prev => ({
       ...prev,
@@ -213,7 +212,7 @@ const SpinWheel = () => {
     try { await spinApi.delete(id); } catch { loadPlaces(); }
   };
 
-  // ── Thêm vào lịch 20:00 hôm nay ──────────────────────────────────────────
+  // ── Add to today's calendar at 20:00 ─────────────────────────────────────
   const addToCalendar = async () => {
     if (!result || addedToCalendar) return;
     const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
@@ -237,18 +236,18 @@ const SpinWheel = () => {
       {/* Header */}
       <div style={{ textAlign: 'center', marginBottom: '20px' }}>
         <h2 className="title-gradient" style={{ fontSize: '1.6rem', marginBottom: '6px' }}>
-          Hôm nay đi đâu? 🎡
+          Where to today? 🎡
         </h2>
         <p style={{ color: 'var(--text-light)', fontSize: '0.9rem' }}>
-          Để số phận quyết định!
+          Let fate decide!
         </p>
       </div>
 
-      {/* Tab chọn loại */}
+      {/* Category tabs */}
       <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', marginBottom: '24px' }}>
         {[
-          { key: 'food', label: 'Ăn gì?', icon: <ChefHat size={16} /> },
-          { key: 'drink', label: 'Uống gì?', icon: <Coffee size={16} /> },
+          { key: 'food',  label: 'Food',  icon: <ChefHat size={16} /> },
+          { key: 'drink', label: 'Drinks', icon: <Coffee  size={16} /> },
         ].map(({ key, label, icon }) => (
           <button
             key={key}
@@ -277,16 +276,16 @@ const SpinWheel = () => {
         </div>
       ) : (
         <>
-          {/* Vòng quay */}
+          {/* Spin wheel */}
           <div className="glass-panel" style={{ padding: '24px', textAlign: 'center', marginBottom: '20px', position: 'relative' }}>
             {places.length === 0 ? (
               <div style={{ padding: '40px 20px', color: 'var(--text-light)' }}>
                 <p style={{ fontSize: '2.5rem', marginBottom: '12px' }}>🍽️</p>
-                <p>Chưa có quán nào! Thêm ngay nhé 👇</p>
+                <p>No places yet! Add some below 👇</p>
               </div>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '20px' }}>
-                {/* Canvas + mũi tên */}
+                {/* Canvas + arrow */}
                 <div style={{ position: 'relative', display: 'inline-block' }}>
                   <canvas
                     ref={canvasRef}
@@ -296,7 +295,7 @@ const SpinWheel = () => {
                   />
                 </div>
 
-                {/* Kết quả */}
+                {/* Result */}
                 {result && (
                   <div style={{
                     background: 'linear-gradient(135deg, #fff0f3, #ffccd5)',
@@ -308,7 +307,7 @@ const SpinWheel = () => {
                     textAlign: 'center',
                   }}>
                     <div style={{ fontSize: '0.8rem', color: 'var(--text-light)', marginBottom: '4px' }}>
-                      🎯 Số phận chọn...
+                      🎯 Fate has chosen...
                     </div>
                     <div style={{ fontSize: '1.3rem', fontWeight: '700', color: 'var(--primary-dark)', marginBottom: '4px' }}>
                       {result.name}
@@ -318,7 +317,7 @@ const SpinWheel = () => {
                         📍 {result.address}
                       </div>
                     )}
-                    {/* Nút thêm vào lịch */}
+                    {/* Add to calendar */}
                     <button
                       onClick={addToCalendar}
                       disabled={addedToCalendar}
@@ -336,12 +335,12 @@ const SpinWheel = () => {
                       }}
                     >
                       <CalendarCheck size={15} />
-                      {addedToCalendar ? '✅ Đã thêm vào lịch!' : 'Thêm vào lịch hôm nay'}
+                      {addedToCalendar ? '✅ Added to calendar!' : "Add to today's plans"}
                     </button>
                   </div>
                 )}
 
-                {/* Nút Spin */}
+                {/* Spin button */}
                 <button
                   onClick={spin}
                   disabled={spinning}
@@ -363,17 +362,17 @@ const SpinWheel = () => {
                   }}
                 >
                   <RotateCcw size={20} style={{ animation: spinning ? 'spin 0.6s linear infinite' : 'none' }} />
-                  {spinning ? 'Đang quay...' : '✨ Quay ngay!'}
+                  {spinning ? 'Spinning...' : '✨ Spin!'}
                 </button>
               </div>
             )}
           </div>
 
-          {/* Danh sách quán */}
+          {/* Places list */}
           <div className="glass-panel" style={{ padding: '20px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
               <h3 style={{ margin: 0, fontSize: '1rem', color: 'var(--text-dark)' }}>
-                {tab === 'food' ? '🍜' : '🧋'} Danh sách ({places.length})
+                {tab === 'food' ? '🍜' : '🧋'} List ({places.length})
               </h3>
               <button
                 onClick={() => { setShowAdd(p => !p); setNewPlace({ name: '', address: '' }); }}
@@ -386,11 +385,11 @@ const SpinWheel = () => {
                   display: 'flex', alignItems: 'center', gap: '4px',
                 }}
               >
-                <Plus size={14} /> {showAdd ? 'Huỷ' : 'Thêm quán'}
+                <Plus size={14} /> {showAdd ? 'Cancel' : 'Add place'}
               </button>
             </div>
 
-            {/* Form thêm quán */}
+            {/* Add form */}
             {showAdd && (
               <form onSubmit={handleAdd} style={{
                 background: 'rgba(255,77,109,0.06)', borderRadius: '14px',
@@ -398,7 +397,7 @@ const SpinWheel = () => {
               }}>
                 <input
                   type="text"
-                  placeholder={`Tên ${tab === 'food' ? 'quán ăn' : 'quán nước'}...`}
+                  placeholder={`${tab === 'food' ? 'Restaurant' : 'Café / drink place'} name...`}
                   value={newPlace.name}
                   onChange={e => setNewPlace(p => ({ ...p, name: e.target.value }))}
                   required
@@ -410,7 +409,7 @@ const SpinWheel = () => {
                 />
                 <input
                   type="text"
-                  placeholder="Địa chỉ (tuỳ chọn)..."
+                  placeholder="Address (optional)..."
                   value={newPlace.address}
                   onChange={e => setNewPlace(p => ({ ...p, address: e.target.value }))}
                   style={{
@@ -429,15 +428,15 @@ const SpinWheel = () => {
                     fontFamily: 'Outfit, sans-serif', opacity: saving ? 0.7 : 1,
                   }}
                 >
-                  {saving ? 'Đang thêm...' : '✅ Thêm vào vòng quay'}
+                  {saving ? 'Saving...' : '✅ Add to wheel'}
                 </button>
               </form>
             )}
 
-            {/* List items */}
+            {/* Empty state */}
             {places.length === 0 ? (
               <p style={{ color: 'var(--text-light)', textAlign: 'center', padding: '20px 0', fontSize: '0.9rem' }}>
-                Chưa có quán nào. Thêm vào nhé! 🙂
+                No places yet. Add one above! 🙂
               </p>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>

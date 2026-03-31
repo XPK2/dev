@@ -23,7 +23,7 @@ public class CoupleBackendApplication {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        // Đọc từ env var ALLOWED_ORIGINS (production) hoặc dùng default local
+        // Read from ALLOWED_ORIGINS env var (production) or fall back to localhost defaults
         String allowedOriginsEnv = System.getenv("ALLOWED_ORIGINS");
         List<String> origins;
         if (allowedOriginsEnv != null && !allowedOriginsEnv.isBlank()) {

@@ -20,7 +20,7 @@ const Chat = () => {
   const otherUserId = myUserId === 1 ? 2 : 1;
   const partner = USERS[otherUserId];
 
-  // Xin quyền push notification khi mở Chat lần đầu
+  // Request push notification permission when Chat first opens
   useEffect(() => { initNotifications(); }, []);
 
   // Load lịch sử tin nhắn
@@ -53,7 +53,7 @@ const Chat = () => {
         client.subscribe(`/user/${myUserId}/queue/messages`, (frame) => {
           const msg = JSON.parse(frame.body);
           setMessages(prev => {
-            // Tránh duplicate (optimistic update)
+            // Avoid duplicate (optimistic update)
             if (prev.some(m => m.id === msg.id)) {
               return prev.map(m => m.id === msg.id ? msg : m);
             }

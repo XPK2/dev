@@ -3,8 +3,8 @@ package com.couple.backend.photo;
 import java.time.LocalDate;
 
 /**
- * DTO nhẹ cho list view — không trả data base64 để tránh payload quá lớn.
- * FE gọi GET /api/v1/photos/{id} khi cần xem full ảnh.
+ * Lightweight DTO for list view — omits base64 data to keep payload small.
+ * FE calls GET /api/v1/photos/{id} when it needs the full image.
  */
 public record PhotoSummary(
     Long id,
@@ -14,7 +14,6 @@ public record PhotoSummary(
     Integer fileSize,
     LocalDate takenDate,
     String createdAt,
-    // Thumbnail: 50 ký tự đầu của data (chỉ để FE biết ảnh không rỗng)
-    // Để tiết kiệm payload, FE load thumbnail riêng qua /photos/{id}/thumb
+    // Reserved for future thumbnail prefix support
     String thumbPrefix
 ) {}

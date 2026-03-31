@@ -33,7 +33,7 @@ public class AnniversaryController {
             daysCount,
             startDate.toString(),
             today.toString(),
-            "Đếm từ " + startDate + " đến nay"
+            "Counted from " + startDate + " to today"
         );
 
         return ApiResponse.success("Days count calculated", response);
