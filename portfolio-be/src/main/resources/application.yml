@@ -1,0 +1,41 @@
+spring:
+  application:
+    name: couple-backend
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: postgres
+    password: 123456
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        jdbc:
+          batch_size: 20
+          fetch_size: 50
+        order_inserts: true
+        order_updates: true
+    open-in-view: false
+  flyway:
+    enabled: true
+    baselineOnMigrate: true
+    locations: classpath:db/migration
+    outOfOrder: true
+    cleanDisabled: true
+
+server:
+  port: 8080
+  servlet:
+    context-path: /
+
+jwt:
+  secret: my-super-secret-key-that-is-at-least-32-characters-long-for-jwt-signing
+  expiration: 86400000  # 24 hours in milliseconds
+
+logging:
+  level:
+    org.springframework: INFO

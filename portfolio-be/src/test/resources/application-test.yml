@@ -1,0 +1,40 @@
+spring:
+  application:
+    name: couple-backend
+  datasource:
+    url: jdbc:h2:mem:testdb
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  h2:
+    console:
+      enabled: true
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+        format_sql: true
+    open-in-view: false
+  flyway:
+    enabled: false
+
+server:
+  port: 8080
+
+jwt:
+  secret: my-super-secret-key-that-is-at-least-32-characters-long-for-jwt-signing
+  expiration: 86400000
+
+google:
+  api:
+    key: test-key
+  drive:
+    folder-id: test-folder-id
+
+logging:
+  level:
+    root: INFO
+    com.couple.backend: DEBUG

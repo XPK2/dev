@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: couple-postgres
+    environment:
+      POSTGRES_DB: couple_db
+      POSTGRES_USER: couple_user
+      POSTGRES_PASSWORD: couple_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - couple_pg_data:/var/lib/postgresql/data
+
+volumes:
+  couple_pg_data:
+
