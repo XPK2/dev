@@ -139,10 +139,10 @@ function App() {
     <Router>
       <Routes>
         <Route path="/login" element={
-          <div className="app-container" style={{ paddingTop: 0 }}>
+          <>
             <Landing />
             <Login />
-          </div>
+          </>
         } />
         <Route path="/" element={
           <ProtectedRoute>
