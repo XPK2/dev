@@ -6,10 +6,9 @@ spring:
     name: couple-backend
 
   datasource:
-    # Hardcode host/db — only password stays as env var
     url: jdbc:postgresql://ep-twilight-flower-a1hfny0w-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=disable
     username: neondb_owner
-    password: ${DB_PASSWORD}
+    password: npg_mM8R3heEJBnF
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 3
