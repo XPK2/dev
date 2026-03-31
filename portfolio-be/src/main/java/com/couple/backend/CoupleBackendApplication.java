@@ -23,26 +23,30 @@ public class CoupleBackendApplication {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        // Read from ALLOWED_ORIGINS env var (production) or fall back to localhost defaults
+        // Allowed origins — production + local dev
         String allowedOriginsEnv = System.getenv("ALLOWED_ORIGINS");
         List<String> origins;
         if (allowedOriginsEnv != null && !allowedOriginsEnv.isBlank()) {
             origins = Arrays.asList(allowedOriginsEnv.split(","));
         } else {
             origins = Arrays.asList(
+                "https://www.thuha.io.vn",
+                "https://thuha.io.vn",
                 "http://localhost:3000",
                 "http://localhost:5173",
                 "http://localhost:5174",
                 "http://127.0.0.1:5173",
-                "http://127.0.0.1:5174",
-                "https://www.thuha.io.vn",
-                "https://thuha.io.vn"
+                "http://127.0.0.1:5174"
             );
         }
 
         configuration.setAllowedOrigins(origins);
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("*"));
+        configuration.setAllowedHeaders(Arrays.asList(
+            "Authorization", "Content-Type", "Accept", "Origin",
+            "X-Requested-With", "Referer", "User-Agent"
+        ));
+        configuration.setExposedHeaders(Arrays.asList("Authorization"));
         configuration.setAllowCredentials(true);
         configuration.setMaxAge(3600L);
 
