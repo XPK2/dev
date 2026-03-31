@@ -261,7 +261,7 @@ const SpinWheel = () => {
                 : 'transparent',
               color: tab === key ? '#fff' : 'var(--primary)',
               fontWeight: '600', fontSize: '0.95rem', cursor: 'pointer',
-              transition: 'all 0.2s', fontFamily: 'Outfit, sans-serif',
+              transition: 'all 0.2s', fontFamily: 'Be Vietnam Pro, sans-serif',
               boxShadow: tab === key ? '0 4px 15px rgba(255,77,109,0.4)' : 'none',
             }}
           >
@@ -330,7 +330,7 @@ const SpinWheel = () => {
                         border: 'none', borderRadius: '20px',
                         padding: '8px 18px', fontSize: '0.85rem', fontWeight: '600',
                         cursor: addedToCalendar ? 'default' : 'pointer',
-                        fontFamily: 'Outfit, sans-serif',
+                        fontFamily: 'Be Vietnam Pro, sans-serif',
                         transition: 'all 0.2s',
                       }}
                     >
@@ -355,7 +355,7 @@ const SpinWheel = () => {
                     fontSize: '1.05rem',
                     fontWeight: '700',
                     cursor: spinning ? 'not-allowed' : 'pointer',
-                    fontFamily: 'Outfit, sans-serif',
+                    fontFamily: 'Be Vietnam Pro, sans-serif',
                     boxShadow: spinning ? 'none' : '0 6px 20px rgba(255,77,109,0.4)',
                     transition: 'all 0.2s',
                     display: 'flex', alignItems: 'center', gap: '10px',
@@ -381,7 +381,7 @@ const SpinWheel = () => {
                   color: showAdd ? 'var(--primary)' : '#fff',
                   border: showAdd ? '1.5px solid var(--primary-light)' : 'none',
                   borderRadius: '20px', padding: '6px 16px', cursor: 'pointer',
-                  fontSize: '0.85rem', fontWeight: '600', fontFamily: 'Outfit, sans-serif',
+                  fontSize: '0.85rem', fontWeight: '600', fontFamily: 'Be Vietnam Pro, sans-serif',
                   display: 'flex', alignItems: 'center', gap: '4px',
                 }}
               >
@@ -404,7 +404,7 @@ const SpinWheel = () => {
                   style={{
                     padding: '10px 14px', borderRadius: '10px',
                     border: '1.5px solid var(--primary-light)', outline: 'none',
-                    fontFamily: 'Outfit, sans-serif', fontSize: '0.95rem',
+                    fontFamily: 'Be Vietnam Pro, sans-serif', fontSize: '0.95rem',
                   }}
                 />
                 <input
@@ -415,7 +415,7 @@ const SpinWheel = () => {
                   style={{
                     padding: '10px 14px', borderRadius: '10px',
                     border: '1px solid #e8c0ca', outline: 'none',
-                    fontFamily: 'Outfit, sans-serif', fontSize: '0.9rem',
+                    fontFamily: 'Be Vietnam Pro, sans-serif', fontSize: '0.9rem',
                   }}
                 />
                 <button
@@ -425,7 +425,7 @@ const SpinWheel = () => {
                     background: 'linear-gradient(135deg, var(--primary), var(--primary-dark))',
                     color: '#fff', border: 'none', borderRadius: '10px',
                     padding: '10px', fontWeight: '600', cursor: saving ? 'not-allowed' : 'pointer',
-                    fontFamily: 'Outfit, sans-serif', opacity: saving ? 0.7 : 1,
+                    fontFamily: 'Be Vietnam Pro, sans-serif', opacity: saving ? 0.7 : 1,
                   }}
                 >
                   {saving ? 'Saving...' : '✅ Add to wheel'}

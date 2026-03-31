@@ -137,7 +137,7 @@ const Chat = () => {
           className="avatar"
         />
         <div>
-          <h3 style={{ margin: 0, fontSize: '1.2rem', fontFamily: 'Outfit, sans-serif' }}>{partner.name}</h3>
+          <h3 style={{ margin: 0, fontSize: '1.2rem', fontFamily: 'Be Vietnam Pro, sans-serif' }}>{partner.name}</h3>
           <span style={{ fontSize: '0.8rem', color: connected ? 'var(--primary)' : 'var(--text-light)', display: 'flex', alignItems: 'center', gap: '4px' }}>
             <span style={{ width: '8px', height: '8px', background: connected ? 'var(--primary)' : '#aaa', borderRadius: '50%', display: 'inline-block' }}></span>
             {connected ? 'Online' : 'Connecting...'}

@@ -68,7 +68,7 @@ const MainApp = () => {
             alt={me?.name}
             style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--primary-light)' }}
           />
-          <span style={{ fontSize: '0.85rem', fontWeight: '600', color: 'var(--primary-dark)', fontFamily: 'Outfit, sans-serif' }}>
+          <span style={{ fontSize: '0.85rem', fontWeight: '600', color: 'var(--primary-dark)', fontFamily: 'Be Vietnam Pro, sans-serif' }}>
             {me?.name}
           </span>
         </div>

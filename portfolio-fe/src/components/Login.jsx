@@ -70,7 +70,7 @@ const Login = () => {
     <div className="login-overlay fade-in">
       <div className="glass-panel login-box">
         <Lock size={40} color="var(--primary)" style={{ marginBottom: '16px' }} />
-        <h2 style={{ fontFamily: 'Outfit, sans-serif', fontSize: '1.5rem', marginBottom: '8px' }}>Secret Space</h2>
+        <h2 style={{ fontFamily: 'Be Vietnam Pro, sans-serif', fontSize: '1.5rem', marginBottom: '8px' }}>Secret Space</h2>
         <p style={{ color: 'var(--text-light)', marginBottom: '24px', fontSize: '0.9rem' }}>
           Enter your 6-digit code
         </p>

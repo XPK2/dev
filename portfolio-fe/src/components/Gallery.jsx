@@ -323,7 +323,7 @@ function UploadModal({ userId, onClose, onUploaded }) {
           style={{
             border: '1.5px solid #f0c0d0', borderRadius: 10,
             padding: '9px 14px', fontSize: 14, outline: 'none',
-            fontFamily: 'Outfit, sans-serif',
+            fontFamily: 'Be Vietnam Pro, sans-serif',
           }}
         />
 
@@ -336,7 +336,7 @@ function UploadModal({ userId, onClose, onUploaded }) {
             style={{
               border: '1.5px solid #f0c0d0', borderRadius: 10,
               padding: '8px 12px', fontSize: 14, outline: 'none', flex: 1,
-              fontFamily: 'Outfit, sans-serif',
+              fontFamily: 'Be Vietnam Pro, sans-serif',
             }}
           />
         </div>
@@ -354,7 +354,7 @@ function UploadModal({ userId, onClose, onUploaded }) {
             cursor: uploading || !dataUrl ? 'not-allowed' : 'pointer',
             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
             transition: 'all .2s',
-            fontFamily: 'Outfit, sans-serif',
+            fontFamily: 'Be Vietnam Pro, sans-serif',
           }}
         >
           {uploading
@@ -530,7 +530,7 @@ export default function Gallery({ userId }) {
             cursor: 'pointer',
             display: 'flex', alignItems: 'center', gap: 6,
             boxShadow: '0 3px 12px rgba(240,96,146,.35)',
-            fontFamily: 'Outfit, sans-serif',
+            fontFamily: 'Be Vietnam Pro, sans-serif',
           }}
         >
           <Upload size={15} /> Add Photo
