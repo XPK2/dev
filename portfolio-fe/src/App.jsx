@@ -138,12 +138,7 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/login" element={
-          <>
-            <Landing />
-            <Login />
-          </>
-        } />
+        <Route path="/login" element={<Login />} />
         <Route path="/" element={
           <ProtectedRoute>
             <MainApp />
