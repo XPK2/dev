@@ -1,66 +1,62 @@
 # application-prod.yml — Production config for Render.com + Neon Tech
-# All secrets are read from Environment Variables set on Render dashboard
+# Neon connection: postgresql://neondb_owner:***@ep-twilight-flower-a1hfny0w-pooler.ap-southeast-1.aws.neon.tech/neondb
 
 spring:
   application:
     name: couple-backend
 
   datasource:
-    # Neon Tech provides DATABASE_URL as:
-    #   postgresql://user:pass@ep-xxx.us-east-2.aws.neon.tech/neondb?sslmode=require
-    # Spring requires the jdbc: prefix — set JDBC_DATABASE_URL on Render instead:
-    #   jdbc:postgresql://user:pass@ep-xxx.../neondb?sslmode=require
-    # OR set DATABASE_URL and use the jdbc-url workaround below.
-    # RECOMMENDED: on Render dashboard set env var name = JDBC_DATABASE_URL
-    url: ${JDBC_DATABASE_URL:${DATABASE_URL}}
+    # Hardcode host/db — only password stays as env var
+    url: jdbc:postgresql://ep-twilight-flower-a1hfny0w-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=disable
+    username: neondb_owner
+    password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
     hikari:
-      maximum-pool-size: 3          # Neon free tier connection limit
+      maximum-pool-size: 3
       minimum-idle: 1
-      connection-timeout: 20000
-      idle-timeout: 300000
-      max-lifetime: 1200000
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
       connection-test-query: SELECT 1
 
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: none
     show-sql: false
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         jdbc:
-          batch_size: 20
-        order_inserts: true
-        order_updates: true
+          lob:
+            non_contextual_creation: true
     open-in-view: false
 
   flyway:
     enabled: true
-    baselineOnMigrate: true
+    baseline-on-migrate: true
     baseline-version: 0
     locations: classpath:db/migration
-    outOfOrder: false
-    cleanDisabled: true
-    validateOnMigrate: false
+    out-of-order: false
+    clean-disabled: true
+    validate-on-migrate: false
 
   servlet:
     multipart:
+      enabled: true
       max-file-size: 10MB
       max-request-size: 10MB
 
 server:
   port: ${PORT:10000}
-  servlet:
-    context-path: /
   tomcat:
     max-http-form-post-size: 10485760
-  compression:
-    enabled: false
 
 jwt:
   secret: ${JWT_SECRET}
   expiration: 86400000
+
+cors:
+  allowed-origins: ${ALLOWED_ORIGINS:https://localhost:5173}
 
 management:
   endpoints:
@@ -76,5 +72,6 @@ logging:
   level:
     root: WARN
     com.couple.backend: INFO
+    org.flywaydb: INFO
   pattern:
     console: "%d{HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
