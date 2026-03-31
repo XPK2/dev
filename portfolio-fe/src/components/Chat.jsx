@@ -1,77 +1,118 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Send, Image as ImageIcon, Smile } from 'lucide-react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { Send, Smile } from 'lucide-react';
+import { Client } from '@stomp/stompjs';
+import SockJS from 'sockjs-client';
 import { chatApi } from '../services/api';
+
+const EMOJIS = ['❤️', '😍', '🥰', '😘', '💕', '😊', '😂', '🥺', '😭', '✨', '💖', '🌹', '🐱', '🐶', '🎉'];
 
 const Chat = () => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(true);
+  const [connected, setConnected] = useState(false);
+  const [showEmoji, setShowEmoji] = useState(false);
   const endRef = useRef(null);
+  const stompClientRef = useRef(null);
 
   const myUserId = parseInt(localStorage.getItem('userId')) || 1;
-  const otherUserId = myUserId === 1 ? 2 : 1; 
+  const otherUserId = myUserId === 1 ? 2 : 1;
   const partnerName = myUserId === 1 ? 'Hà' : 'Huy';
 
-  useEffect(() => {
-    loadMessages();
-    
-    // Optional: simple polling to get new messages every 5 seconds
-    const interval = setInterval(() => {
-      loadMessages(false);
-    }, 5000);
-    
-    return () => clearInterval(interval);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const loadMessages = async (scrollToBottom = true) => {
+  // Load lịch sử tin nhắn
+  const loadMessages = useCallback(async () => {
     try {
       const res = await chatApi.getConversation(otherUserId, 0, 50);
       if (res.success) {
-        // Backend returns newest first based on API doc, so we reverse it to render top-to-bottom
-        const sortedMsgs = res.data.content.reverse();
-        setMessages(sortedMsgs);
-        if (scrollToBottom) {
-          setTimeout(() => endRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
-        }
+        const sorted = [...res.data.content].reverse();
+        setMessages(sorted);
+        setTimeout(() => endRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
       }
     } catch (err) {
-      console.error("Failed to fetch messages:", err);
+      console.error('Failed to fetch messages:', err);
     } finally {
       setLoading(false);
     }
-  };
+  }, [otherUserId]);
+
+  // Kết nối WebSocket
+  useEffect(() => {
+    loadMessages();
+
+    const token = localStorage.getItem('token');
+    const client = new Client({
+      webSocketFactory: () => new SockJS('http://localhost:8080/ws'),
+      connectHeaders: { Authorization: `Bearer ${token}` },
+      reconnectDelay: 5000,
+      onConnect: () => {
+        setConnected(true);
+        client.subscribe(`/user/${myUserId}/queue/messages`, (frame) => {
+          const msg = JSON.parse(frame.body);
+          setMessages(prev => {
+            // Tránh duplicate (optimistic update)
+            if (prev.some(m => m.id === msg.id)) {
+              return prev.map(m => m.id === msg.id ? msg : m);
+            }
+            return [...prev, msg];
+          });
+          setTimeout(() => endRef.current?.scrollIntoView({ behavior: 'smooth' }), 50);
+        });
+      },
+      onDisconnect: () => setConnected(false),
+      onStompError: () => setConnected(false),
+    });
+
+    client.activate();
+    stompClientRef.current = client;
+
+    return () => {
+      client.deactivate();
+    };
+  }, [myUserId, loadMessages]);
 
   useEffect(() => {
-    endRef.current?.scrollIntoView({ behavior: "smooth" });
+    endRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
   const handleSend = async (e) => {
-    e.preventDefault();
-    if (!input.trim()) return;
+    e?.preventDefault();
+    const text = input.trim();
+    if (!text) return;
+    setInput('');
+    setShowEmoji(false);
 
-    // Optimistic UI update
+    // Optimistic UI
     const tempMsg = {
-      id: Date.now(),
+      id: `temp-${Date.now()}`,
       senderId: myUserId,
       receiverId: otherUserId,
-      content: input,
-      createdAt: new Date().toISOString()
+      content: text,
+      createdAt: new Date().toISOString(),
     };
-    
     setMessages(prev => [...prev, tempMsg]);
-    setInput('');
-    endRef.current?.scrollIntoView({ behavior: "smooth" });
+    endRef.current?.scrollIntoView({ behavior: 'smooth' });
 
-    try {
-      const res = await chatApi.sendMessage(otherUserId, tempMsg.content);
-      if (res.success) {
-        // Replace temp message with real message from server
-        setMessages(prev => prev.map(m => m.id === tempMsg.id ? res.data : m));
+    // Gửi qua WebSocket nếu connected, fallback REST
+    if (stompClientRef.current?.connected) {
+      stompClientRef.current.publish({
+        destination: '/app/chat.send',
+        body: JSON.stringify({ receiverId: otherUserId, content: text }),
+      });
+    } else {
+      try {
+        const res = await chatApi.sendMessage(otherUserId, text);
+        if (res.success) {
+          setMessages(prev => prev.map(m => m.id === tempMsg.id ? res.data : m));
+        }
+      } catch (err) {
+        console.error('Send failed:', err);
       }
-    } catch (err) {
-      console.error("Format Failed to send message:", err);
     }
+  };
+
+  const handleEmojiClick = (emoji) => {
+    setInput(prev => prev + emoji);
+    setShowEmoji(false);
   };
 
   const formatTime = (isoString) => {
@@ -82,46 +123,64 @@ const Chat = () => {
   return (
     <div className="fade-in chat-container glass-panel" style={{ padding: 0, overflow: 'hidden' }}>
       <div className="chat-header">
-        <img 
-          src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=100&q=80" 
-          alt="Partner" 
+        <img
+          src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=100&q=80"
+          alt="Partner"
           className="avatar"
         />
         <div>
           <h3 style={{ margin: 0, fontSize: '1.2rem', fontFamily: 'Outfit, sans-serif' }}>{partnerName}</h3>
-          <span style={{ fontSize: '0.8rem', color: 'var(--primary-light)', display: 'flex', alignItems: 'center', gap: '4px' }}>
-            <span style={{ width: '8px', height: '8px', background: 'var(--primary)', borderRadius: '50%', display: 'inline-block' }}></span>
-            Active now
+          <span style={{ fontSize: '0.8rem', color: connected ? 'var(--primary)' : 'var(--text-light)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <span style={{ width: '8px', height: '8px', background: connected ? 'var(--primary)' : '#aaa', borderRadius: '50%', display: 'inline-block' }}></span>
+            {connected ? 'Online' : 'Connecting...'}
           </span>
         </div>
       </div>
 
       <div className="chat-messages">
         {loading && messages.length === 0 ? (
-          <div style={{textAlign: 'center', color: 'var(--text-light)', marginTop: '20px'}}>Loading messages...</div>
+          <div style={{ textAlign: 'center', color: 'var(--text-light)', marginTop: '20px' }}>Loading messages...</div>
         ) : (
           messages.map((msg) => (
             <div key={msg.id} className={`message ${msg.senderId === myUserId ? 'sent' : 'received'}`}>
               {msg.content}
-              <span className="message-time">
-                {formatTime(msg.createdAt)}
-              </span>
+              <span className="message-time">{formatTime(msg.createdAt)}</span>
             </div>
           ))
         )}
         <div ref={endRef} />
       </div>
 
+      {/* Emoji Picker */}
+      {showEmoji && (
+        <div style={{
+          padding: '8px 12px',
+          borderTop: '1px solid var(--glass-border)',
+          display: 'flex', flexWrap: 'wrap', gap: '8px', background: 'rgba(255,255,255,0.7)'
+        }}>
+          {EMOJIS.map(emoji => (
+            <button
+              key={emoji}
+              onClick={() => handleEmojiClick(emoji)}
+              style={{ background: 'none', border: 'none', fontSize: '1.4rem', cursor: 'pointer', padding: '2px' }}
+            >
+              {emoji}
+            </button>
+          ))}
+        </div>
+      )}
+
       <form className="chat-input" onSubmit={handleSend} style={{ borderTop: '1px solid var(--glass-border)' }}>
-        <button type="button" style={{ background: 'none', border: 'none', color: 'var(--text-light)', cursor: 'pointer' }}>
-          <ImageIcon size={24} />
-        </button>
-        <button type="button" style={{ background: 'none', border: 'none', color: 'var(--text-light)', cursor: 'pointer' }}>
+        <button
+          type="button"
+          onClick={() => setShowEmoji(p => !p)}
+          style={{ background: 'none', border: 'none', color: showEmoji ? 'var(--primary)' : 'var(--text-light)', cursor: 'pointer' }}
+        >
           <Smile size={24} />
         </button>
-        <input 
-          type="text" 
-          placeholder="Type a message..." 
+        <input
+          type="text"
+          placeholder="Type a message..."
           value={input}
           onChange={(e) => setInput(e.target.value)}
         />

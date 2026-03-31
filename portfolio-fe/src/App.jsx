@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
-import { Heart, Image as ImageIcon, MessageCircle, ListTodo, Home as HomeIcon, ClipboardList } from 'lucide-react';
+import { Heart, MessageCircle, ListTodo, ClipboardList, LogOut } from 'lucide-react';
 import Landing from './components/Landing';
 import Home from './components/Home';
 import Chat from './components/Chat';
@@ -46,7 +46,7 @@ const MainApp = () => {
   return (
     <div className="app-container">
       <nav className="top-nav" style={{ overflowX: 'auto', scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch', justifyContent: 'flex-start' }}>
-        <button 
+        <button
           className={`nav-item ${activeTab === 'home' ? 'active' : ''}`}
           onClick={() => setActiveTab('home')}
         >
@@ -54,7 +54,7 @@ const MainApp = () => {
           <span>Counter</span>
         </button>
 
-        <button 
+        <button
           className={`nav-item ${activeTab === 'chat' ? 'active' : ''}`}
           onClick={() => setActiveTab('chat')}
         >
@@ -62,7 +62,7 @@ const MainApp = () => {
           <span>Chat</span>
         </button>
 
-        <button 
+        <button
           className={`nav-item ${activeTab === 'bucket' ? 'active' : ''}`}
           onClick={() => setActiveTab('bucket')}
         >
@@ -70,7 +70,7 @@ const MainApp = () => {
           <span>Bucket</span>
         </button>
 
-        <button 
+        <button
           className={`nav-item ${activeTab === 'rules' ? 'active' : ''}`}
           onClick={() => setActiveTab('rules')}
         >
@@ -78,11 +78,9 @@ const MainApp = () => {
           <span>Rules</span>
         </button>
 
-        <button 
-          className="nav-item"
-          onClick={handleLogout}
-        >
-          <span style={{color: 'var(--primary-dark)', fontWeight: 'bold'}}>Thoát (Logout)</span>
+        <button className="nav-item" onClick={handleLogout}>
+          <LogOut className="nav-icon" size={18} />
+          <span>Logout</span>
         </button>
       </nav>
 
