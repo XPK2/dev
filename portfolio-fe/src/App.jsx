@@ -28,9 +28,40 @@ const ProtectedRoute = ({ children }) => {
 // Main App Layout with Nav
 const MainApp = () => {
   const [activeTab, setActiveTab] = useState('home');
+  const [me, setMe] = useState(null);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const myUserId = parseInt(localStorage.getItem('userId')) || 1;
-  const me = USERS[myUserId];
+  const token = localStorage.getItem('token');
+
+  useEffect(() => {
+    // Fetch current user from API
+    const fetchUser = async () => {
+      try {
+        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080/api/v1';
+        const response = await fetch(`${apiUrl}/auth/me`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+        if (response.ok) {
+          const userData = await response.json();
+          setMe(userData);
+        } else {
+          // Fallback to constants
+          setMe(USERS[myUserId]);
+        }
+      } catch (error) {
+        console.error('Failed to fetch user:', error);
+        // Fallback to constants
+        setMe(USERS[myUserId]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUser();
+  }, [myUserId, token]);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -60,21 +91,33 @@ const MainApp = () => {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="app-container">
+        <nav className="top-nav">
+          <p>Loading...</p>
+        </nav>
+      </div>
+    );
+  }
+
   return (
     <div className="app-container">
       <nav className="top-nav" style={{ overflowX: 'auto', scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch', justifyContent: 'flex-start' }}>
 
         {/* Current user avatar */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '0 12px', minWidth: 'fit-content' }}>
-          <img
-            src={localStorage.getItem(`customAvatar_${myUserId}`) || me?.avatar}
-            alt={me?.name}
-            style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--primary-light)' }}
-          />
-          <span style={{ fontSize: '0.85rem', fontWeight: '600', color: 'var(--primary-dark)', fontFamily: 'Be Vietnam Pro, sans-serif' }}>
-            {me?.name}
-          </span>
-        </div>
+        {me && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '0 12px', minWidth: 'fit-content' }}>
+            <img
+              src={me.avatar || USERS[myUserId]?.avatar}
+              alt={me.name}
+              style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--primary-light)' }}
+            />
+            <span style={{ fontSize: '0.85rem', fontWeight: '600', color: 'var(--primary-dark)', fontFamily: 'Be Vietnam Pro, sans-serif' }}>
+              {me.name}
+            </span>
+          </div>
+        )}
 
         <button
           className={`nav-item ${activeTab === 'home' ? 'active' : ''}`}

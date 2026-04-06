@@ -13,6 +13,6 @@ CREATE TABLE IF NOT EXISTS photos (
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_photos_taken_date  ON photos(taken_date DESC);
-CREATE INDEX idx_photos_created_at  ON photos(created_at DESC);
-CREATE INDEX idx_photos_uploaded_by ON photos(uploaded_by);
+CREATE INDEX IF NOT EXISTS idx_photos_taken_date  ON photos(taken_date DESC);
+CREATE INDEX IF NOT EXISTS idx_photos_created_at  ON photos(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_photos_uploaded_by ON photos(uploaded_by);

@@ -2,6 +2,7 @@ package com.couple.backend.auth.service;
 
 import com.couple.backend.auth.dto.LoginRequest;
 import com.couple.backend.auth.dto.LoginResponse;
+import com.couple.backend.auth.dto.UserResponse;
 import com.couple.backend.auth.entity.User;
 import com.couple.backend.auth.repository.UserRepository;
 import com.couple.backend.common.constant.UserConstant;
@@ -35,5 +36,12 @@ public class AuthService {
 
     private boolean isValidCode(String code) {
         return code.equals(UserConstant.USER_1_CODE) || code.equals(UserConstant.USER_2_CODE);
+    }
+
+    public UserResponse getCurrentUser(String code) {
+        User user = userRepository.findByCode(code)
+            .orElseThrow(() -> new AppException("USER_NOT_FOUND", "User not found", 404));
+        
+        return new UserResponse(user.getId(), user.getCode(), user.getName());
     }
 }

@@ -2,9 +2,12 @@ package com.couple.backend.auth.controller;
 
 import com.couple.backend.auth.dto.LoginRequest;
 import com.couple.backend.auth.dto.LoginResponse;
+import com.couple.backend.auth.dto.UserResponse;
 import com.couple.backend.auth.service.AuthService;
 import com.couple.backend.common.dto.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
@@ -19,5 +22,11 @@ public class AuthController {
     public ApiResponse<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
         LoginResponse response = authService.login(request);
         return ApiResponse.success("Login successful", response);
+    }
+
+    @GetMapping("/me")
+    public ApiResponse<UserResponse> getCurrentUser(@AuthenticationPrincipal UserDetails userDetails) {
+        UserResponse response = authService.getCurrentUser(userDetails.getUsername());
+        return ApiResponse.success("Current user retrieved", response);
     }
 }
