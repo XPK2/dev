@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
-import { Heart, MessageCircle, ListTodo, ClipboardList, LogOut, Dices, Image } from 'lucide-react';
+import { Heart, MessageCircle, ListTodo, ClipboardList, LogOut, Dices, Image, Settings as SettingsIcon } from 'lucide-react';
 import bgImage from './assets/bg.jpg';
 import Landing from './components/Landing';
 import Home from './components/Home';
@@ -9,6 +9,7 @@ import BucketList from './components/BucketList';
 import FamilyRules from './components/FamilyRules';
 import SpinWheel from './components/SpinWheel';
 import Gallery from './components/Gallery';
+import Settings from './components/Settings';
 import Login from './components/Login';
 import { USERS } from './constants/users';
 
@@ -52,6 +53,8 @@ const MainApp = () => {
         return <SpinWheel />;
       case 'gallery':
         return <Gallery userId={myUserId} />;
+      case 'settings':
+        return <Settings />;
       default:
         return <Home />;
     }
@@ -64,7 +67,7 @@ const MainApp = () => {
         {/* Current user avatar */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '0 12px', minWidth: 'fit-content' }}>
           <img
-            src={me?.avatar}
+            src={localStorage.getItem(`customAvatar_${myUserId}`) || me?.avatar}
             alt={me?.name}
             style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--primary-light)' }}
           />
@@ -119,6 +122,14 @@ const MainApp = () => {
         >
           <Image className="nav-icon" size={18} />
           <span>Album</span>
+        </button>
+
+        <button
+          className={`nav-item ${activeTab === 'settings' ? 'active' : ''}`}
+          onClick={() => setActiveTab('settings')}
+        >
+          <SettingsIcon className="nav-icon" size={18} />
+          <span>Settings</span>
         </button>
 
         <button className="nav-item" onClick={handleLogout}>
