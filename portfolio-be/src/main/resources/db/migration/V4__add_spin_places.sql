@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS spin_places (
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_spin_places_category ON spin_places(category);
+CREATE INDEX IF NOT EXISTS idx_spin_places_category ON spin_places(category);
 
 -- Seed default places
 INSERT INTO spin_places (name, category, address, created_by) VALUES
