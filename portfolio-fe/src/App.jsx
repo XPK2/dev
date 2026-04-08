@@ -45,7 +45,13 @@ const MainApp = () => {
           },
         });
         if (response.ok) {
-          const userData = await response.json();
+          const apiResponse = await response.json();
+          // Extract data from ApiResponse wrapper
+          let userData = apiResponse.data || apiResponse;
+          // Map avatar field if it exists
+          if (!userData.avatar && userData.imageLink) {
+            userData.avatar = userData.imageLink;
+          }
           setMe(userData);
         } else {
           // Fallback to constants
@@ -73,7 +79,7 @@ const MainApp = () => {
   const renderContent = () => {
     switch (activeTab) {
       case 'home':
-        return <Home />;
+        return <Home currentUser={me} />;
       case 'chat':
         return <Chat />;
       case 'bucket':
@@ -87,7 +93,7 @@ const MainApp = () => {
       case 'settings':
         return <Settings />;
       default:
-        return <Home />;
+        return <Home currentUser={me} />;
     }
   };
 

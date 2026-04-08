@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Check, AlertCircle, RotateCcw } from 'lucide-react';
 import { USERS } from '../constants/users';
+import { authApi } from '../services/api';
 import '../styles/Settings.css';
 
 const Settings = () => {
@@ -89,23 +90,47 @@ const Settings = () => {
     }
   };
 
-  const handleAvatarApply = () => {
+  const handleAvatarApply = async () => {
     if (!avatarPreview) {
       setAvatarMessage({ type: 'error', text: 'Please preview an image first' });
       return;
     }
 
-    localStorage.setItem(`customAvatar_${myUserId}`, avatarUrl);
-    setAvatarMessage({ type: 'success', text: 'Avatar updated! Reloading...' });
-    setTimeout(() => window.location.reload(), 1000);
+    setAvatarLoading(true);
+    try {
+      const response = await authApi.updateAvatar(avatarUrl);
+      if (response.success) {
+        setAvatarMessage({ type: 'success', text: 'Avatar updated! Reloading...' });
+        setTimeout(() => window.location.reload(), 1000);
+      } else {
+        setAvatarMessage({ type: 'error', text: response.message || 'Failed to update avatar' });
+      }
+    } catch (error) {
+      console.error('Error updating avatar:', error);
+      setAvatarMessage({ type: 'error', text: 'Failed to update avatar: ' + error.message });
+    } finally {
+      setAvatarLoading(false);
+    }
   };
 
-  const handleAvatarReset = () => {
-    setAvatarUrl('');
-    setAvatarPreview('');
-    localStorage.removeItem(`customAvatar_${myUserId}`);
-    setAvatarMessage({ type: 'success', text: 'Avatar reset to default! Reloading...' });
-    setTimeout(() => window.location.reload(), 1000);
+  const handleAvatarReset = async () => {
+    setAvatarLoading(true);
+    try {
+      const response = await authApi.updateAvatar('');
+      if (response.success) {
+        setAvatarUrl('');
+        setAvatarPreview('');
+        setAvatarMessage({ type: 'success', text: 'Avatar reset to default! Reloading...' });
+        setTimeout(() => window.location.reload(), 1000);
+      } else {
+        setAvatarMessage({ type: 'error', text: response.message || 'Failed to reset avatar' });
+      }
+    } catch (error) {
+      console.error('Error resetting avatar:', error);
+      setAvatarMessage({ type: 'error', text: 'Failed to reset avatar: ' + error.message });
+    } finally {
+      setAvatarLoading(false);
+    }
   };
 
   return (

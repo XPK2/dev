@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { Upload, X, Trash2, ZoomIn, ChevronLeft, ChevronRight, Calendar, Image, Loader2 } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { enUS } from 'date-fns/locale';
-import { photoApi } from '../services/api';
+import { photoApi, authApi } from '../services/api';
 import { USERS } from '../constants/users';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
@@ -64,8 +64,25 @@ function monthLabel(key) {
 
 // ── Avatar ────────────────────────────────────────────────────────────────────
 function Avatar({ userId, size = 24 }) {
-  const user = USERS[userId];
+  const [userData, setUserData] = useState(null);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await authApi.getUserById(userId);
+        if (res.success) {
+          setUserData(res.data);
+        }
+      } catch (err) {
+        console.error('Failed to fetch user:', err);
+      }
+    };
+    fetchUser();
+  }, [userId]);
+
+  const user = userData || USERS[userId];
   if (!user) return null;
+
   return (
     <img
       src={user.avatar}

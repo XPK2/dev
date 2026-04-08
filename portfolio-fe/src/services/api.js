@@ -60,6 +60,8 @@ const apiClient = {
 // Auth APIs
 export const authApi = {
   login: async (code) => apiClient.post('/auth/login', { code }, false),
+  updateAvatar: async (avatarUrl) => apiClient.put('/auth/avatar', { avatarUrl }, true),
+  getUserById: async (userId) => apiClient.get(`/auth/user/${userId}`, false),
 };
 
 // Health APIs

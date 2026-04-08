@@ -4,13 +4,15 @@ public class UserResponse {
     private Long id;
     private String code;
     private String name;
+    private String avatar;
 
     public UserResponse() {}
 
-    public UserResponse(Long id, String code, String name) {
+    public UserResponse(Long id, String code, String name, String avatar) {
         this.id = id;
         this.code = code;
         this.name = name;
+        this.avatar = avatar;
     }
 
     public Long getId() {
@@ -35,5 +37,13 @@ public class UserResponse {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
     }
 }

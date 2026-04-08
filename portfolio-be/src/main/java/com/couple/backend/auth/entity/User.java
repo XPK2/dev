@@ -15,6 +15,9 @@ public class User {
     @Column(nullable = false)
     private String name;
 
+    @Column(nullable = true, columnDefinition = "TEXT")
+    private String imageLink;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -64,6 +67,14 @@ public class User {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getImageLink() {
+        return imageLink;
+    }
+
+    public void setImageLink(String imageLink) {
+        this.imageLink = imageLink;
     }
 
     public LocalDateTime getCreatedAt() {

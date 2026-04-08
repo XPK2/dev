@@ -1,18 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { format, differenceInDays } from 'date-fns';
 import { Heart, Calendar as CalendarIcon, Plus, Trash2 } from 'lucide-react';
-import { anniversaryApi, eventsApi } from '../services/api';
+import { anniversaryApi, eventsApi, authApi } from '../services/api';
 import { USERS } from '../constants/users';
 
-const myUserId = parseInt(localStorage.getItem('userId')) || 1;
-const partnerId = myUserId === 1 ? 2 : 1;
-const ME = USERS[myUserId];
-const PARTNER = USERS[partnerId];
-
-const Home = () => {
+const Home = ({ currentUser }) => {
+  const myUserId = parseInt(localStorage.getItem('userId')) || 1;
+  const partnerId = myUserId === 1 ? 2 : 1;
+  
+  // Use currentUser from props (API data with avatar), fallback to USERS constants
+  const ME = currentUser || USERS[myUserId];
+  const PARTNER = USERS[partnerId];
   const [days, setDays] = useState(0);
   const [hours, setHours] = useState(0);
   const [minutes, setMinutes] = useState(0);
+  const [partnerData, setPartnerData] = useState(null);
   const [startDate, setStartDate] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -23,7 +25,19 @@ const Home = () => {
   useEffect(() => {
     loadAnniversaryData();
     loadEvents();
+    loadPartnerData();
   }, []);
+
+  const loadPartnerData = async () => {
+    try {
+      const res = await authApi.getUserById(partnerId);
+      if (res.success) {
+        setPartnerData(res.data);
+      }
+    } catch (err) {
+      console.error('Failed to load partner data:', err);
+    }
+  };
 
   const loadAnniversaryData = async () => {
     try {
@@ -93,15 +107,15 @@ const Home = () => {
         <div className="counter-content">
           <div className="avatar-row">
             <img
-              src={ME.avatar}
+              src={ME.avatar || ME.imageLink}
               alt={ME.name}
               className="avatar animate-float"
               style={{ animationDelay: '0s' }}
             />
             <Heart size={36} className="heart-icon animate-pulse-heart" />
             <img
-              src={PARTNER.avatar}
-              alt={PARTNER.name}
+              src={partnerData?.avatar || PARTNER.avatar || PARTNER.imageLink || USERS[partnerId]?.avatar}
+              alt={partnerData?.name || PARTNER.name}
               className="avatar animate-float"
               style={{ animationDelay: '1s' }}
             />

@@ -42,6 +42,23 @@ public class AuthService {
         User user = userRepository.findByCode(code)
             .orElseThrow(() -> new AppException("USER_NOT_FOUND", "User not found", 404));
         
-        return new UserResponse(user.getId(), user.getCode(), user.getName());
+        return new UserResponse(user.getId(), user.getCode(), user.getName(), user.getImageLink());
+    }
+
+    public UserResponse getCurrentUserById(Long userId) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new AppException("USER_NOT_FOUND", "User not found", 404));
+        
+        return new UserResponse(user.getId(), user.getCode(), user.getName(), user.getImageLink());
+    }
+
+    public UserResponse updateUserAvatar(Long userId, String avatarUrl) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new AppException("USER_NOT_FOUND", "User not found", 404));
+        
+        user.setImageLink(avatarUrl);
+        userRepository.save(user);
+        
+        return new UserResponse(user.getId(), user.getCode(), user.getName(), user.getImageLink());
     }
 }
