@@ -5,10 +5,13 @@ spring:
   application:
     name: couple-backend
 
+  main:
+    lazy-initialization: true
+
   datasource:
-    url: jdbc:postgresql://ep-twilight-flower-a1hfny0w-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=disable
-    username: neondb_owner
-    password: npg_mM8R3heEJBnF
+    url: ${DB_URL:jdbc:postgresql://ep-twilight-flower-a1hfny0w-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=disable}
+    username: ${DB_USERNAME:neondb_owner}
+    password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 3
@@ -38,6 +41,16 @@ spring:
     out-of-order: false
     clean-disabled: true
     validate-on-migrate: false
+
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+
+  cache:
+    type: redis
+    redis:
+      time-to-live: 300000
 
   servlet:
     multipart:

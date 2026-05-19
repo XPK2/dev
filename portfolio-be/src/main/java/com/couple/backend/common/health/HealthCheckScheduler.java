@@ -29,6 +29,13 @@ public class HealthCheckScheduler {
 
     private final JdbcTemplate jdbcTemplate;
 
+    /**
+     * If true -> app will self-ping /actuator/health to keep Render awake.
+     * If false -> allow BE to sleep when there's no traffic (Render free tier behavior).
+     */
+    @Value("${app.keep-alive.enabled:false}")
+    private boolean keepAliveEnabled;
+
     // Render injects this automatically as RENDER_EXTERNAL_URL
     @Value("${RENDER_EXTERNAL_URL:}")
     private String renderExternalUrl;
@@ -55,9 +62,9 @@ public class HealthCheckScheduler {
             log.error("[HealthCheck] {} | DB=FAIL | {}", time, e.getMessage());
         }
 
-        // 2. Self HTTP ping — keeps Render free tier awake
+        // 2. Self HTTP ping — optional (Render free tier can sleep if disabled)
         String httpStatus = "SKIP";
-        if (renderExternalUrl != null && !renderExternalUrl.isBlank()) {
+        if (keepAliveEnabled && renderExternalUrl != null && !renderExternalUrl.isBlank()) {
             try {
                 HttpRequest request = HttpRequest.newBuilder()
                         .uri(URI.create(renderExternalUrl + "/actuator/health"))

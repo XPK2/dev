@@ -117,11 +117,20 @@ export const spinApi = {
   delete: async (id) => apiClient.delete(`/spin/${id}`, true),
 };
 
-// Photo Gallery APIs
-export const photoApi = {
-  list: async () => apiClient.get('/photos', true),
-  getOne: async (id) => apiClient.get(`/photos/${id}`, true),
-  upload: async (data) => apiClient.post('/photos', data, true),
-  delete: async (id) => apiClient.delete(`/photos/${id}`, true),
-};
+ // Photo Gallery APIs
+ export const photoApi = {
+   list: async () => apiClient.get('/photos', true),
+   getOne: async (id) => apiClient.get(`/photos/${id}`, true),
+   upload: async (data) => apiClient.post('/photos', data, true),
+   delete: async (id) => apiClient.delete(`/photos/${id}`, true),
+ };
+
+ // Notes APIs
+ export const notesApi = {
+   getAll: async () => apiClient.get('/notes', true),
+   create: async (data) => apiClient.post('/notes', data, true),
+   update: async (id, data) => apiClient.put(`/notes/${id}`, data, true),
+   togglePin: async (id) => apiClient.patch(`/notes/${id}/pin`, true),
+   delete: async (id) => apiClient.delete(`/notes/${id}`, true),
+ };
 

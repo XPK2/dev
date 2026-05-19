@@ -31,6 +31,16 @@ spring:
     cleanDisabled: true
     validateOnMigrate: false
 
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+
+  cache:
+    type: redis
+    redis:
+      time-to-live: 300000
+
   # Tăng giới hạn request size cho upload ảnh base64
   servlet:
     multipart:
